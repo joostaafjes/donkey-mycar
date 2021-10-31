@@ -8,6 +8,7 @@
 # The update operation will not touch this file.
 # """
 
+AI_THROTTLE_MULT = 0.9
 # import os
 # 
 # #PATHS
@@ -19,12 +20,12 @@
 # DRIVE_LOOP_HZ = 20
 # MAX_LOOPS = 100000
 # DRIVE_TRAIN_TYPE = "SERVO_ESC" # SERVO_ESC|DC_STEER_THROTTLE|DC_TWO_WHEEL|SERVO_HBRIDGE_PWM|PIGPIO_PWM|MM1|MOCK
-AI_THROTTLE_MULT = 0.8
 # 
 # #CAMERA
 # CAMERA_TYPE = "PICAM"   # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
-# IMAGE_W = 160
-IMAGE_H = 128
+IMAGE_W = 160 # was 160
+#IMAGE_H = 304 # was 120
+IMAGE_H = 128 # was 120
 # IMAGE_DEPTH = 3         # default RGB=3, make 1 for mono
 # CAMERA_FRAMERATE = DRIVE_LOOP_HZ
 # CAMERA_VFLIP = False
@@ -36,14 +37,17 @@ IMAGE_H = 128
 # 
 # #STEERING
 # STEERING_CHANNEL = 1
-# STEERING_LEFT_PWM = 460
-# STEERING_RIGHT_PWM = 290
+STEERING_LEFT_PWM = 490 # was 460
+STEERING_RIGHT_PWM = 310 # was 290
 # 
 # #THROTTLE
 # THROTTLE_CHANNEL = 0
-# THROTTLE_FORWARD_PWM = 500
-# THROTTLE_STOPPED_PWM = 370
-# THROTTLE_REVERSE_PWM = 220
+#THROTTLE_FORWARD_PWM = 500 # initial value
+#THROTTLE_FORWARD_PWM = 450 # max value after calibration
+#THROTTLE_FORWARD_PWM = 395 # tmp value to reduce max speed
+THROTTLE_FORWARD_PWM = 405
+THROTTLE_STOPPED_PWM = 370
+THROTTLE_REVERSE_PWM = 300 # was 220
 # 
 # #TRAINING
 # DEFAULT_MODEL_TYPE = 'linear' #(linear|categorical|rnn|imu|behavior|3d|localizer|latent)
@@ -90,7 +94,7 @@ IMAGE_H = 128
 # JOYSTICK_MAX_THROTTLE = 0.5         #this scalar is multiplied with the -1 to 1 throttle value to limit the maximum throttle. This can help if you drop the controller or just don't need the full speed available.
 # JOYSTICK_STEERING_SCALE = 1.0       #some people want a steering that is less sensitve. This scalar is multiplied with the steering -1 to 1. It can be negative to reverse dir.
 # AUTO_RECORD_ON_THROTTLE = True      #if true, we will record whenever throttle is not zero. if false, you must manually toggle recording with some other trigger. Usually circle button on joystick.
-# CONTROLLER_TYPE='ps3'               #(ps3|ps4|xbox|nimbus|wiiu|F710|rc3|MM1|custom) custom will run the my_joystick.py controller written by the `donkey createjs` command
+CONTROLLER_TYPE='F710'               #(ps3|ps4|xbox|nimbus|wiiu|F710|rc3|MM1|custom) custom will run the my_joystick.py controller written by the `donkey createjs` command
 # USE_NETWORKED_JS = False            #should we listen for remote joystick control over the network?
 # NETWORK_JS_SERVER_IP = "192.168.0.1"#when listening for network joystick control, which ip is serving this information
 # JOYSTICK_DEADZONE = 0.0             # when non zero, this is the smallest throttle before recording triggered.
@@ -119,3 +123,7 @@ IMAGE_H = 128
 # 
 # SIM_HOST = "127.0.0.1"              # when racing on virtual-race-league use host "trainmydonkey.com"
 # SIM_ARTIFICIAL_LATENCY = 0          # this is the millisecond latency in controls. Can use useful in emulating the delay when useing a remote server. values of 100 to 400 probably reasonable.
+
+STOP_SIGN_DETECTOR = True
+STOP_SIGN_MIN_SCORE = 0.2
+STOP_SIGN_SHOW_BOUNDING_BOX = True

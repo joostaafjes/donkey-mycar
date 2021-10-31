@@ -28,8 +28,10 @@ class DriveMode:
         if mode == 'user':
             return user_angle, user_throttle
         elif mode == 'local_angle':
+            print(f"mode:{mode}, user_angle/plot_angle:{user_angle}/{pilot_angle} user_throttle/pilot_throttle:{user_throttle}/{pilot_throttle}")
             return pilot_angle if pilot_angle else 0.0, user_throttle
         else:
+            print(f"mode:{mode}, user_angle/plot_angle:{user_angle}/{pilot_angle} user_throttle/pilot_throttle:{user_throttle}/{pilot_throttle * self.cfg.AI_THROTTLE_MULT}")
             return pilot_angle if pilot_angle else 0.0, \
                    pilot_throttle * self.cfg.AI_THROTTLE_MULT if \
                        pilot_throttle else 0.0
@@ -62,6 +64,7 @@ def drive(cfg, model_path=None, model_type=None):
         cam = DonkeyGymEnv(cfg.DONKEY_SIM_PATH, host=cfg.SIM_HOST, env_name=cfg.DONKEY_GYM_ENV_NAME, conf=cfg.GYM_CONF, delay=cfg.SIM_ARTIFICIAL_LATENCY)
         inputs = ['angle', 'throttle', 'brake']
     elif cfg.CAMERA_TYPE == "PICAM":
+        print('PICAM')
         from donkeycar.parts.camera import PiCamera
         cam = PiCamera(image_w=cfg.IMAGE_W, image_h=cfg.IMAGE_H,
                        image_d=cfg.IMAGE_DEPTH, framerate=cfg.CAMERA_FRAMERATE,
@@ -93,7 +96,7 @@ def drive(cfg, model_path=None, model_type=None):
     else:
         raise (Exception("Unkown camera type: %s" % cfg.CAMERA_TYPE))
 
-    car.add(cam, inputs=inputs, outputs=['cam/image_array'], threaded=True)
+    car.add(cam, inputs=inputs, outputs=['cam/image_array', 'fullcam/image_array'], threaded=True)
 
     # add controller
     if cfg.USE_JOYSTICK_AS_DEFAULT:
@@ -109,12 +112,16 @@ def drive(cfg, model_path=None, model_type=None):
                                  mode=cfg.WEB_INIT_MODE)
 
     car.add(ctr,
-            inputs=['cam/image_array'],
+            inputs=['fullcam/image_array'],
             outputs=['user/angle', 'user/throttle', 'user/mode', 'recording'],
             threaded=True)
 
     # pilot condition to determine if user or ai are driving
     car.add(PilotCondition(), inputs=['user/mode'], outputs=['run_pilot'])
+
+    if cfg.STOP_SIGN_DETECTOR:
+        from donkeycar.parts.object_detector.stop_sign_detector import StopSignDetector
+        car.add(StopSignDetector(cfg.STOP_SIGN_MIN_SCORE, cfg.STOP_SIGN_SHOW_BOUNDING_BOX), inputs=['fullcam/image_array', 'pilot/throttle'], outputs=['pilot/throttle', 'fullcam/image_array'])
 
     # adding the auto-pilot
     if model_type is None:

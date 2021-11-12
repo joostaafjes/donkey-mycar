@@ -37,7 +37,7 @@ class DriveMode:
         angle = user_angle
 
         if mode == 'local_angle':
-            throttle = pilot_throttle
+            angle = pilot_angle
         elif mode == 'local_pilot':
             throttle = pilot_throttle
             angle = pilot_angle

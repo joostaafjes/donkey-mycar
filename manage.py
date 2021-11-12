@@ -25,16 +25,31 @@ class DriveMode:
         self.cfg = cfg
 
     def run(self, mode, user_angle, user_throttle, pilot_angle, pilot_throttle):
-        if mode == 'user':
-            return user_angle, user_throttle
-        elif mode == 'local_angle':
-            print(f"mode:{mode}, user_angle/plot_angle:{user_angle}/{pilot_angle} user_throttle/pilot_throttle:{user_throttle}/{pilot_throttle}")
-            return pilot_angle if pilot_angle else 0.0, user_throttle
+        if not pilot_angle:
+            pilot_angle = 0.0
+        if pilot_throttle:
+            pilot_throttle *= self.cfg.AI_THROTTLE_MULT
         else:
-            print(f"mode:{mode}, user_angle/plot_angle:{user_angle}/{pilot_angle} user_throttle/pilot_throttle:{user_throttle}/{pilot_throttle * self.cfg.AI_THROTTLE_MULT}")
-            return pilot_angle if pilot_angle else 0.0, \
-                   pilot_throttle * self.cfg.AI_THROTTLE_MULT if \
-                       pilot_throttle else 0.0
+            pilot_throttle = 0.0
+
+        # default for mode user
+        throttle = user_throttle
+        angle = user_angle
+
+        if mode == 'local_angle':
+            throttle = pilot_throttle
+        elif mode == 'local_pilot':
+            throttle = pilot_throttle
+            angle = pilot_angle
+        elif mode == 'override':
+            if throttle == 0.0:
+                throttle = pilot_throttle
+            if angle == 0.0:
+                angle = pilot_angle
+
+        print(f"mode:{mode}, user_angle/pilot_angle:{user_angle:.2f}/{pilot_angle:.2f} -> {angle:.2f} -- user_throttle/pilot_throttle:{user_throttle:.2f}/{pilot_throttle:.2f} -> {throttle:.2f}")
+
+        return angle, throttle
 
 
 class PilotCondition:

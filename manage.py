@@ -47,7 +47,7 @@ class DriveMode:
             if angle == 0.0:
                 angle = pilot_angle
 
-        print(f"mode:{mode}, user_angle/pilot_angle:{user_angle:.2f}/{pilot_angle:.2f} -> {angle:.2f} -- user_throttle/pilot_throttle:{user_throttle:.2f}/{pilot_throttle:.2f} -> {throttle:.2f}")
+        #print(f"mode:{mode}, user_angle/pilot_angle:{user_angle:.2f}/{pilot_angle:.2f} -> {angle:.2f} -- user_throttle/pilot_throttle:{user_throttle:.2f}/{pilot_throttle:.2f} -> {throttle:.2f}")
 
         return angle, throttle
 
@@ -79,7 +79,6 @@ def drive(cfg, model_path=None, model_type=None):
         cam = DonkeyGymEnv(cfg.DONKEY_SIM_PATH, host=cfg.SIM_HOST, env_name=cfg.DONKEY_GYM_ENV_NAME, conf=cfg.GYM_CONF, delay=cfg.SIM_ARTIFICIAL_LATENCY)
         inputs = ['angle', 'throttle', 'brake']
     elif cfg.CAMERA_TYPE == "PICAM":
-        print('PICAM')
         from donkeycar.parts.camera import PiCamera
         cam = PiCamera(image_w=cfg.IMAGE_W, image_h=cfg.IMAGE_H,
                        image_d=cfg.IMAGE_DEPTH, framerate=cfg.CAMERA_FRAMERATE,
@@ -175,7 +174,7 @@ def drive(cfg, model_path=None, model_type=None):
         car.add(throttle, inputs=['throttle'])
 
     # add tub to save data
-    inputs = ['cam/image_array', 'user/angle', 'user/throttle', 'user/mode']
+    inputs = ['fullcam/image_array', 'user/angle', 'user/throttle', 'user/mode']
     types = ['image_array', 'float', 'float', 'str']
     # do we want to store new records into own dir or append to existing
     tub_path = TubHandler(path=cfg.DATA_PATH).create_tub_path() if \
